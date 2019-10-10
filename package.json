@@ -33,6 +33,7 @@
     "gulp-stylint": "^4.0.2",
     "gulp-stylus": "^2.7.0",
     "gulp-zip": "^5.0.0",
+    "jsdoc-x": "^4.0.3",
     "minimist": "^1.2.0",
     "node-notifier": "^5.2.1",
     "nw-builder": "^3.5.7",

@@ -15,6 +15,8 @@ const path = require('path'),
       filemode = require('filemode'),
       zip = require('gulp-zip'),
 
+      jsdocx = require('jsdoc-x'),
+
       streamQueue = require('streamqueue'),
       notifier = require('node-notifier'),
       fs = require('fs-extra'),
@@ -225,6 +227,29 @@ const docs = async () => {
     }
 };
 
+const kindMap = {
+    function: 'Function'
+};
+const bakeCompletions = () =>
+    jsdocx.parse({
+        files: './app/data/ct.release/**/*.js',
+        excludePattern: '(DragonBones|pixi)'
+    })
+    .then(docs => {
+        const registry = [];
+        for (const doc of docs) {
+            const item = {
+                label: doc.name,
+                insertText: doc.longname,
+                documentation: kindMap[doc.kind] || 'Function',
+                kind: doc
+            };
+            registry.push(item);
+        }
+        console.log(docs);
+        console.log(registry);
+    });
+
 const nwPackages = async () => {
     await fs.remove(path.join('./build', `ctjs - v${pack.version}`));
     var nw = new NwBuilder({
@@ -370,3 +395,4 @@ exports.build = build;
 exports.deploy = deploy;
 exports.deployOnly = deployOnly;
 exports.default = defaultTask;
+exports.bakeCompletions = bakeCompletions;

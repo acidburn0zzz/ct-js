@@ -1,4 +1,6 @@
-(window => {
+(function() {
+    const {extend} = require('./data/node_requires/utils');
+    const monaco = require('monaco');
     var ctjsCoreCompletions = [
         'ct.pixiApp',
         'ct.libs',
@@ -98,72 +100,31 @@
      * @returns {void}
      */
     var extendHotkeys = editor => {
-        editor.$blockScrolling = Infinity;
-        editor.commands.addCommand({
-            name: 'increaseFontSize',
-            bindKey: {
-                win: 'Ctrl-+',
-                mac: 'Command-+'
-            },
-            exec(editor) {
-                var num = Number(localStorage.fontSize);
-                if (num < 48) {
-                    num++;
-                    localStorage.fontSize = num;
-                    editor.tag.style.fontSize = num+'px';
-                }
-                return false;
-            },
-            readOnly: true
+        // eslint-disable-next-line no-bitwise
+        editor.addCommand(monaco.KeyCode.Ctrl | monaco.KeyCode.US_EQUAL, function(editor) {
+            var num = Number(localStorage.fontSize);
+            if (num < 48) {
+                num++;
+                localStorage.fontSize = num;
+                editor.tag.style.fontSize = num+'px';
+            }
+            return false;
         });
-        editor.commands.addCommand({
-            name: 'decreaseFontSize',
-            bindKey: {
-                win: 'Ctrl--',
-                mac: 'Command--'
-            },
-            exec(editor) {
-                var num = Number(localStorage.fontSize);
-                if (num > 6) {
-                    num--;
-                    localStorage.fontSize = num;
-                    editor.tag.style.fontSize = num+'px';
-                }
-                return false;
-            },
-            readOnly: true
+        // eslint-disable-next-line no-bitwise
+        editor.addCommand(monaco.KeyCode.Ctrl | monaco.KeyCode.US_MINUS, function(editor) {
+            var num = Number(localStorage.fontSize);
+            if (num > 6) {
+                num--;
+                localStorage.fontSize = num;
+                editor.tag.style.fontSize = num+'px';
+            }
+            return false;
         });
     };
 
     var defaultOptions = {
-        mode: 'plain_text'
-    };
-
-    var highlightBracketsOverride = function(Range) {
-        var {session} = this;
-        if (!session || !session.bgTokenizer) { return; }
-        if (session.$bracketHighlight) { // Remove highlighting and set vars undefined
-            session.$bracketHighlight = session.removeMarker(session.$bracketHighlight);
-            session.$bracketHighlightMatch = session.removeMarker(session.$bracketHighlightMatch);
-        }
-        var cursorPos = this.getCursorPosition();
-        cursorPos.column += 1; // Look for right-side bracket first
-        var matchPos = session.findMatchingBracket(cursorPos);
-        var matchRange;
-        if (matchPos) {
-            matchRange = new Range(matchPos.row, matchPos.column, matchPos.row, matchPos.column + 1);
-        } else { // No right-side bracket, check left
-            cursorPos.column -= 1;
-            matchPos = session.findMatchingBracket(cursorPos);
-            if (matchPos) {
-                matchRange = new Range(matchPos.row, matchPos.column, matchPos.row, matchPos.column + 1);
-            }
-        }
-        if (matchRange) {
-            var cursorRange = new Range(cursorPos.row, cursorPos.column - 1, cursorPos.row, cursorPos.column);
-            session.$bracketHighlight = session.addMarker(cursorRange, 'ace_bracket', 'text');
-            session.$bracketHighlightMatch = session.addMarker(matchRange, 'ace_bracket', 'text');
-        }
+        language: 'plain_text',
+        fontSize: localStorage.fontSize
     };
 
     const themeMappings = {
@@ -184,26 +145,14 @@
      * @returns {AceEditor} Editor instance
      */
     window.setupAceEditor = (tag, options) => {
-        /* global ace */
-        const langTools = ace.require('ace/ext/language_tools');
+        const opts = extend(extend({}, defaultOptions), options);
+        opts.value = opts.value || tag.value || '';
+        const codeEditor = monaco.editor.create(tag, opts);
 
-        options = options || defaultOptions;
-        var aceEditor = window.ace.edit(tag);
-        extendHotkeys(aceEditor);
-        aceEditor.setTheme('ace/theme/' + (localStorage.UItheme in themeMappings? themeMappings[localStorage.UItheme] : themeMappings.default));
-        tag.aceEditor = aceEditor;
-        aceEditor.tag = tag;
-        aceEditor.session = aceEditor.getSession();
-        tag.style.fontSize = localStorage.fontSize + 'px';
-        aceEditor.session.setMode('ace/mode/' + options.mode || defaultOptions.mode);
-        aceEditor.setOptions({
-            enableBasicAutocompletion: true,
-            enableSnippets: false,
-            enableLiveAutocompletion: true
-        });
-        aceEditor.completers = [langTools.textCompleter, jsCompleter];
-        var {Range} = window.ace.require('ace/range'); // Needed for highlight override
-        aceEditor.$highlightBrackets = highlightBracketsOverride.bind(aceEditor, Range);
-        return aceEditor;
+        extendHotkeys(codeEditor);
+
+        tag.codeEditor = codeEditor;
+        codeEditor.tag = tag;
+        return codeEditor;
     };
 })(this);
