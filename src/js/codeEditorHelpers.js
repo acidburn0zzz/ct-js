@@ -33,7 +33,8 @@
     var defaultOptions = {
         language: 'plain_text',
         fontSize: localStorage.fontSize,
-        theme: 'tomorrow'
+        theme: 'tomorrow',
+        colorDecorators: true
     };
 
     const themeMappings = {
@@ -43,9 +44,9 @@
         default: 'tomorrow'
     };
     const glob = require('./data/node_requires/glob');
-    glob.aceThemeMappings = themeMappings;
+    glob.codeEditorThemeMappings = themeMappings;
     /**
-     * Mounts an Ace editor on the passed tag.
+     * Mounts a Monaco editor on the passed tag.
      *
      * @global
      * @param {HTMLTextareaElement|HTMLDivElement} tag A tag where an editor should be placed. It can be a textarea or any other block.
