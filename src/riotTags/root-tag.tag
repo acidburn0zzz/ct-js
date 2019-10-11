@@ -1,6 +1,6 @@
 root-tag
-    main-menu
-    notepad-panel
+    main-menu(if="{!selectorVisible}")
+    notepad-panel(if="{!selectorVisible}")
     project-selector(if="{selectorVisible}")
     script.
         this.selectorVisible = true;

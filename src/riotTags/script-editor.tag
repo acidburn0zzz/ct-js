@@ -1,10 +1,10 @@
 script-editor.view.panel
     .flexfix.tall
         div.flexfix-header
-            b {voc.name}  
+            b {voc.name}
             input(type="text" value="{script.name}" onchange="{wire('this.script.name')}")
         .flexfix-body
-            .acer(ref="editor")
+            .aCodeEditor(ref="editor")
         button.nm.flexfix-footer(onclick="{saveScript}")
             i.icon.icon-confirm
             span {voc.done}
@@ -18,7 +18,7 @@ script-editor.view.panel
                 var editorOptions = {
                     mode: 'javascript'
                 };
-                this.editor = window.setupAceEditor(this.refs.editor, editorOptions);
+                this.editor = window.setupCodeEditor(this.refs.editor, editorOptions);
                 this.editor.session.on('change', e => {
                     this.script.code = this.editor.getValue();
                 });

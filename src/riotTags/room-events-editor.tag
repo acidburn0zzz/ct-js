@@ -15,13 +15,13 @@ room-events-editor.view.panel
                 span {voc.leave}
         div(style="position: relative;")
             .tabbed(show="{tab === 'roomcreate'}")
-                .acer(ref="roomoncreate")
+                .aCodeEditor(ref="roomoncreate")
             .tabbed(show="{tab === 'roomstep'}")
-                .acer(ref="roomonstep")
+                .aCodeEditor(ref="roomonstep")
             .tabbed(show="{tab === 'roomdraw'}")
-                .acer(ref="roomondraw")
+                .aCodeEditor(ref="roomondraw")
             .tabbed(show="{tab === 'roomleave'}")
-                .acer(ref="roomonleave")
+                .aCodeEditor(ref="roomonleave")
     button.wide.nogrow.noshrink(onclick="{roomSaveEvents}")
         i.icon.icon-confirm
         span {voc.done}
@@ -41,52 +41,41 @@ room-events-editor.view.panel
             } else if (tab === 'roomleave') {
                 editor = this.roomonleave;
             }
-            editor.moveCursorTo(0,0);
-            editor.clearSelection();
-            this.focusEditor();
-        };
-        this.focusEditor = () => {
-            if (this.tab === 'roomcreate') {
-                this.roomoncreate.focus();
-            } else if (this.tab === 'roomstep') {
-                this.roomonstep.focus();
-            } else if (this.tab === 'roomdraw') {
-                this.roomondraw.focus();
-            } else if (this.tab === 'roomleave') {
-                this.roomonleave.focus();
-            }
+            setTimeout(() => {
+                editor.layout();
+                editor.focus();
+            }, 0);
         };
         window.signals.on('roomsFocus', this.focusEditor);
         this.on('unmount', () => {
-            window.signals.off('roomsFocus', this.focusEditor); 
+            window.signals.off('roomsFocus', this.focusEditor);
         });
         this.on('mount', e => {
             this.room = this.opts.room;
             setTimeout(() => {
                 var editorOptions = {
-                    mode: 'javascript'
+                    language: 'javascript'
                 };
-                this.roomoncreate = window.setupAceEditor(this.refs.roomoncreate, editorOptions);
-                this.roomonstep = window.setupAceEditor(this.refs.roomonstep, editorOptions);
-                this.roomondraw = window.setupAceEditor(this.refs.roomondraw, editorOptions);
-                this.roomonleave = window.setupAceEditor(this.refs.roomonleave, editorOptions);
-                this.roomoncreate.session.on('change', e => {
+                this.roomoncreate = window.setupCodeEditor(this.refs.roomoncreate, editorOptions);
+                this.roomonstep = window.setupCodeEditor(this.refs.roomonstep, editorOptions);
+                this.roomondraw = window.setupCodeEditor(this.refs.roomondraw, editorOptions);
+                this.roomonleave = window.setupCodeEditor(this.refs.roomonleave, editorOptions);
+                this.roomoncreate.onDidChangeModelContent(e => {
                     this.room.oncreate = this.roomoncreate.getValue();
                 });
-                this.roomonstep.session.on('change', e => {
+                this.roomonstep.onDidChangeModelContent(e => {
                     this.room.onstep = this.roomonstep.getValue();
                 });
-                this.roomondraw.session.on('change', e => {
+                this.roomondraw.onDidChangeModelContent(e => {
                     this.room.ondraw = this.roomondraw.getValue();
                 });
-                this.roomonleave.session.on('change', e => {
+                this.roomonleave.onDidChangeModelContent(e => {
                     this.room.onleave = this.roomonleave.getValue();
                 });
                 this.roomoncreate.setValue(this.room.oncreate);
                 this.roomonstep.setValue(this.room.onstep);
                 this.roomondraw.setValue(this.room.ondraw);
                 this.roomonleave.setValue(this.room.onleave);
-
             }, 0);
         });
         this.roomSaveEvents = e => {

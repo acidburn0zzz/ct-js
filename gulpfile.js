@@ -28,7 +28,7 @@ const argv = minimist(process.argv.slice(2));
 
 const pack = require('./app/package.json');
 
-const nwVersion = '0.34.1',
+const nwVersion = '0.41.2',
       platforms = ['osx64', 'win32', 'win64', 'linux32', 'linux64'],
       nwFiles = ['./app/**', '!./app/export/**', '!./app/projects/**', '!./app/exportDesktop/**', '!./app/cache/**', '!./app/.vscode/**', '!./app/JamGames/**'];
 
@@ -233,7 +233,8 @@ const kindMap = {
 const bakeCompletions = () =>
     jsdocx.parse({
         files: './app/data/ct.release/**/*.js',
-        excludePattern: '(DragonBones|pixi)'
+        excludePattern: '(DragonBones|pixi)',
+        undocumented: false
     })
     .then(docs => {
         const registry = [];
@@ -241,8 +242,8 @@ const bakeCompletions = () =>
             const item = {
                 label: doc.name,
                 insertText: doc.longname,
-                documentation: kindMap[doc.kind] || 'Function',
-                kind: doc
+                documentation: doc.description,
+                kind: kindMap[doc.kind] || 'Function'
             };
             registry.push(item);
         }

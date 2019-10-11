@@ -57,13 +57,13 @@ type-editor.panel.view.flexrow
                     span {voc.destroy}
             div
                 #typeoncreate.tabbed(show="{tab === 'typeoncreate'}")
-                    .acer(ref="typeoncreate")
+                    .aCodeEditor(ref="typeoncreate")
                 #typeonstep.tabbed(show="{tab === 'typeonstep'}")
-                    .acer(ref="typeonstep")
+                    .aCodeEditor(ref="typeonstep")
                 #typeondraw.tabbed(show="{tab === 'typeondraw'}")
-                    .acer(ref="typeondraw")
+                    .aCodeEditor(ref="typeondraw")
                 #typeondestroy.tabbed(show="{tab === 'typeondestroy'}")
-                    .acer(ref="typeondestroy")
+                    .aCodeEditor(ref="typeondestroy")
     texture-selector(if="{selectingTexture}" onselected="{applyTexture}" oncancelled="{cancelTexture}" ref="textureselector" showempty="sure")
     script.
         const glob = require('./data/node_requires/glob');
@@ -112,20 +112,10 @@ type-editor.panel.view.flexrow
             } else if (this.tab === 'typeoncreate') {
                 editor = this.typeoncreate;
             }
-            editor.moveCursorTo(0,0);
-            editor.clearSelection();
-            this.focusEditor();
-        };
-        this.focusEditor = () => {
-            if (this.tab === 'typeonstep') {
-                this.typeonstep.focus();
-            } else if (this.tab === 'typeondraw') {
-                this.typeondraw.focus();
-            } else if (this.tab === 'typeondestroy') {
-                this.typeondestroy.focus();
-            } else if (this.tab === 'typeoncreate') {
-                this.typeoncreate.focus();
-            }
+            setTimeout(() => {
+                editor.layout();
+                editor.focus();
+            }, 0);
         };
         window.signals.on('typesFocus', this.focusEditor);
         this.on('unmount', () => {
@@ -134,33 +124,31 @@ type-editor.panel.view.flexrow
 
         this.on('mount', () => {
             var editorOptions = {
-                mode: 'javascript'
+                language: 'javascript'
             };
             setTimeout(() => {
-                this.typeoncreate = window.setupAceEditor(this.refs.typeoncreate, editorOptions);
-                this.typeonstep = window.setupAceEditor(this.refs.typeonstep, editorOptions);
-                this.typeondraw = window.setupAceEditor(this.refs.typeondraw, editorOptions);
-                this.typeondestroy = window.setupAceEditor(this.refs.typeondestroy, editorOptions);
+                this.typeoncreate = window.setupCodeEditor(this.refs.typeoncreate, editorOptions);
+                this.typeonstep = window.setupCodeEditor(this.refs.typeonstep, editorOptions);
+                this.typeondraw = window.setupCodeEditor(this.refs.typeondraw, editorOptions);
+                this.typeondestroy = window.setupCodeEditor(this.refs.typeondestroy, editorOptions);
 
                 this.typeoncreate.setValue(this.type.oncreate);
                 this.typeonstep.setValue(this.type.onstep);
                 this.typeondraw.setValue(this.type.ondraw);
                 this.typeondestroy.setValue(this.type.ondestroy);
 
-                this.typeoncreate.getSession().on('change', (e) => {
+                this.typeoncreate.onDidChangeModelContent(e => {
                     this.type.oncreate = this.typeoncreate.getValue();
                 });
-                this.typeonstep.getSession().on('change', (e) => {
+                this.typeonstep.onDidChangeModelContent(e => {
                     this.type.onstep = this.typeonstep.getValue();
                 });
-                this.typeondraw.getSession().on('change', (e) => {
+                this.typeondraw.onDidChangeModelContent(e => {
                     this.type.ondraw = this.typeondraw.getValue();
                 });
-                this.typeondestroy.getSession().on('change', (e) => {
+                this.typeondestroy.onDidChangeModelContent(e => {
                     this.type.ondestroy = this.typeondestroy.getValue();
                 });
-                this.typeoncreate.moveCursorTo(0,0);
-                this.typeoncreate.clearSelection();
                 this.typeoncreate.focus();
             }, 0);
         });
