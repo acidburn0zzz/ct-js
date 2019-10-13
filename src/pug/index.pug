@@ -39,13 +39,14 @@ html
                 baseUrl: 'node_modules/monaco-editor/min'
             });
             amdRequire(['vs/editor/editor.main'], function() {
+                window.signals = window.signals || riot.observable({});
+                window.signals.trigger('monacoBooted');
                 const tomorrow = require('./data/node_requires/monaco-themes/tomorrow.json');
                 monaco.editor.defineTheme('tomorrow', tomorrow);
             });
         script.
             'use strict';
-            window.signals = {};
-            riot.observable(window.signals);
+            window.signals = window.signals || riot.observable({});
             riot.mount('*');
             setTimeout(() => {
                 document.getElementById('loading').classList.add('fadeout');

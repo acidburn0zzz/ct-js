@@ -1,6 +1,22 @@
 (function() {
     const {extend} = require('./data/node_requires/objectUtils');
-    /* global monaco */
+    /* global monaco riot */
+
+    window.signals = window.signals || riot.observable({});
+    window.signals.on('monacoBooted', () => {
+        monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
+        const coreCompletions = require('./data/node_requires/codeEditor/autocompletions.json');
+        for (const completion in coreCompletions) {
+            completion.kind = monaco.languages.CompletionItemKind[completion.kind];
+        }
+        monaco.languages.registerCompletionItemProvider('javascript', {
+            provideCompletionItems: (model, position) => {
+                return {
+                    suggestions: coreCompletions
+                };
+            }
+        });
+    });
 
     /**
      * Adds custom hotkeys to the editors, specifically Ctrl+Plus, Ctrl+Minus for font size manipulation.
@@ -33,8 +49,12 @@
     var defaultOptions = {
         language: 'plain_text',
         fontSize: localStorage.fontSize,
+        fontFamily: localStorage.fontFamily || 'Iosevka, monospace',
         theme: 'tomorrow',
-        colorDecorators: true
+        colorDecorators: true,
+        get fontLigatures() {
+            return localStorage.codeLigatures !== 'off';
+        }
     };
 
     const themeMappings = {

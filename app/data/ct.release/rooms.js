@@ -1,6 +1,11 @@
 (function () {
     /* global deadPool */
     class Room extends PIXI.Container {
+        /**
+         * Creates an instance of Room, based on a given template.
+         * @param {object} template The template to use, usually from `ct.rooms.templates`.
+         * @memberof Room
+         */
         constructor(template) {
             super();
             this.x = this.y = 0;
@@ -38,6 +43,10 @@
             }
             return this;
         }
+        /**
+         * The horizontal position of the room.
+         * @memberof Room
+         */
         get x () {
             return -this.position.x;
         }
@@ -45,6 +54,10 @@
             this.position.x = -value;
             return value;
         }
+        /**
+         * The vertical position of the room.
+         * @memberof Room
+         */
         get y () {
             return -this.position.y;
         }
@@ -56,14 +69,29 @@
     var nextRoom;
     ct.rooms = {
         templates: {},
+        /**
+         * Creates and adds a background to the current room, at the given depth.
+         * @param {string} texture The name of the texture to use
+         * @param {number} depth The depth of the new background
+         * @returns {Background} The created background
+         */
         addBg(texture, depth) {
             const bg = new ct.types.Background(texture, null, depth);
             ct.room.addChild(bg);
             return bg;
         },
+        /**
+         * Adds a new empty tile layer to the room, at the given depth
+         * @param {number} layer The depth of the layer
+         * @returns {Tileset} The created tile layer
+         */
         addTileLayer(layer) {
             return new ct.types.Tileset(layer);
         },
+        /**
+         * Clears the current room
+         * @return {void}
+         */
         clear() {
             ct.stage.children = [];
             ct.stack = [];
@@ -71,11 +99,22 @@
                 ct.types.list[i] = [];
             }
         },
+        /**
+         * Switches to the given room. Note that this transition happens at the end
+         * of the frame, so the name of a new room may be overridden.
+         * @param {string} room The name of a new room
+         * @returns {void}
+         */
         'switch'(room) {
             nextRoom = room;
             ct.rooms.switching = true;
         },
         switching: false,
+        /**
+         * Loads a given room and adds it to the stage. Useful for embedding prefabs and UI screens.
+         * @param  {string} roomName The name of a room to add to the stage
+         * @returns {Room} The newly created room
+         */
         load(roomName) {
             const room = new Room(ct.rooms.templates[roomName]);
             ct.stage.addChild(ct.room);
@@ -110,6 +149,9 @@
         onLeave() {
             /*%roomonleave%*/
         },
+        /**
+         * The name of the starting room, as it was set in ct.IDE.
+         */
         starting: '@startroom@'
     };
 })();

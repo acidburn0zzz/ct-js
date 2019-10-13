@@ -29,6 +29,12 @@
             /*%res%*/
             PIXI.Loader.shared.load();
         },
+        /**
+         * Gets a pixi.js texture from a ct.js' texture name, so that it can be used in pixi.js objects.
+         * @param {string} name The name of the ct.js texture
+         * @param {number} [frame] The frame to extract
+         * @returns {PIXI.Texture|Array<PIXI.Texture>} If `frame` was specified, returns a single PIXI.Texture. Otherwise, returns an array with all the frames of this ct.js' texture.
+         */
         getTexture(name, frame) {
             if (name === -1) {
                 if (frame !== void 0) {
@@ -42,6 +48,11 @@
             }
             return reg.textures;
         },
+        /**
+         * Creates a DragonBones skeleton, ready to be added to your copies.
+         * @param {string} name The name of the skeleton asset
+         * @returns {Object} The created skeleton
+         */
         makeSkeleton(name) {
             const r = ct.res.skelRegistry[name],
                   skel = dbFactory.buildArmatureDisplay('Armature', r.data.name);

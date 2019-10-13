@@ -64,35 +64,6 @@
             return this;
         }
 
-        set grav(value) {
-            this.gravity = value;
-            return value;
-        }
-        get grav() {
-            return this.gravity;
-        }
-        set gravdir(value) {
-            this.gravityDir = value;
-            return value;
-        }
-        get gravdir() {
-            return this.gravityDir;
-        }
-        set dir(value) {
-            this.direction = value;
-            return value;
-        }
-        get dir() {
-            return this.direction;
-        }
-        set spd(value) {
-            this.speed = value;
-            return value;
-        }
-        get spd() {
-            return this.speed;
-        }
-
         set tex(value) {
             this.textures = ct.res.getTexture(value);
             this[textureAccessor] = value;
@@ -274,7 +245,19 @@
             BACKGROUND: [],
             TILELAYER: []
         },
+        /**
+         * A map of all the templates of types exported from ct.IDE.
+         */
         templates: { },
+        /**
+         * Creates a new copy of a given type.
+         * @param {string} type The name of the type to use
+         * @param {number} [x] The x coordinate of a new copy. Defaults to 0.
+         * @param {number} [y] The y coordinate of a new copy. Defaults to 0.
+         * @param {Object} [exts] An optional object which parameters will be applied to the copy prior to its OnCreate event.
+         * @param {PIXI.Container} [container] The container to which add the copy. Defaults to the current room.
+         * @returns {Copy} the created copy.
+         */
         make(type, x, y, exts, container) {
             // An advanced constructor. Returns a Copy
             if (exts instanceof PIXI.Container) {
@@ -291,9 +274,24 @@
             onCreateModifier.apply(obj);
             return obj;
         },
+        /**
+         * Calls `move` on a given copy, recalculating its position based on its speed.
+         * @param {Copy} o The copy to move
+         * @returns {void}
+         * @deprecated
+         */
         move(o) {
             o.move();
         },
+        /**
+         * Applies an acceleration to the copy, with a given additive speed and direction.
+         * Technically, calls copy's `addSpeed(spd, dir)` method.
+         * @param {any} o The copy to accelerate
+         * @param {any} spd The speed to add
+         * @param {any} dir The direction in which to push the copy
+         * @returns {void}
+         * @deprecated
+         */
         addSpeed(o, spd, dir) {
             o.addSpeed(spd, dir);
         },

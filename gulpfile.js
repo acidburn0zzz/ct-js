@@ -110,7 +110,8 @@ const compileRiot = () =>
 
 const concatScripts = () =>
     streamQueue({objectMode: true},
-        gulp.src('./src/js/**'),
+        gulp.src('./src/js/3rdparty/riot.min.js'),
+        gulp.src(['./src/js/**', '!./src/js/3rdparty/riot.min.js']),
         gulp.src('./temp/riot.js')
     )
     .pipe(sourcemaps.init())
@@ -227,28 +228,67 @@ const docs = async () => {
     }
 };
 
+// @see https://microsoft.github.io/monaco-editor/api/enums/monaco.languages.completionitemkind.html
 const kindMap = {
-    function: 'Function'
+    function: 'Function',
+    class: 'Class'
 };
+const getAutocompletion = doc => {
+    if (doc.kind === 'function') {
+        if (!doc.params || doc.params.length === 0) {
+            return doc.longname + '()';
+        }
+        return doc.longname + `(${doc.params.map(param => param.name).join(', ')})`;
+    }
+    if (doc.kind === 'class') {
+        return doc.name;
+    }
+    return doc.longname;
+};
+const getDocumentation = doc => {
+    if (!doc.description) {
+        return void 0;
+    }
+    if (doc.kind === 'function') {
+        return {
+            value: `${doc.description}
+${(doc.params || []).map(param => `* \`${param.name}\` (${param.type.names.join('|')}) ${param.description} ${param.optional? '(optional)' : ''}`).join('\n')}
+
+Returns ${doc.returns[0].type.names.join('|')}, ${doc.returns[0].description}`
+        };
+    }
+    return {
+        value: doc.description
+    };
+};
+
 const bakeCompletions = () =>
     jsdocx.parse({
         files: './app/data/ct.release/**/*.js',
         excludePattern: '(DragonBones|pixi)',
-        undocumented: false
+        undocumented: false,
+        allowUnknownTags: true
     })
     .then(docs => {
         const registry = [];
         for (const doc of docs) {
+            console.log(doc);
+            if (doc.params) {
+                for (const param of doc.params) {
+                    console.log(param);
+                }
+            }
             const item = {
                 label: doc.name,
-                insertText: doc.longname,
-                documentation: doc.description,
-                kind: kindMap[doc.kind] || 'Function'
+                insertText: doc.autocomplete || getAutocompletion(doc),
+                documentation: getDocumentation(doc),
+                kind: kindMap[doc.kind] || 'Property'
             };
             registry.push(item);
         }
-        console.log(docs);
-        console.log(registry);
+        fs.outputJSON('./app/data/node_requires/codeEditor/autocompletions.json', registry, {
+            spaces: 2
+        });
     });
 
 const nwPackages = async () => {

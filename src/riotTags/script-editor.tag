@@ -16,10 +16,10 @@ script-editor.view.panel
         this.on('mount', e => {
             setTimeout(() => {
                 var editorOptions = {
-                    mode: 'javascript'
+                    language: 'javascript'
                 };
                 this.editor = window.setupCodeEditor(this.refs.editor, editorOptions);
-                this.editor.session.on('change', e => {
+                this.editor.onDidChangeModelContent(e => {
                     this.script.code = this.editor.getValue();
                 });
                 this.editor.setValue(this.script.code);
