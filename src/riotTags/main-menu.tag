@@ -1,7 +1,7 @@
 main-menu.flexcol
     nav.nogrow.flexrow(if="{window.currentProject}")
         ul#fullscreen.nav
-            li(onclick="{toggleFullscreen}" title="{voc.min}")
+            li.nbr(onclick="{toggleFullscreen}" title="{voc.min}")
                 i(class="icon-{fullscreen? 'minimize-2' : 'maximize-2'}")
 
         ul#app.nav.tabs
@@ -9,7 +9,7 @@ main-menu.flexcol
                 i.icon-menu
             li.it30(onclick="{saveProject}" title="{voc.save}")
                 i.icon-save
-            li.it30(onclick="{runProject}" title="{voc.launch}")
+            li.nbr.it30(onclick="{runProject}" title="{voc.launch}")
                 i.icon-play
 
         ul#mainnav.nav.tabs
@@ -245,6 +245,12 @@ main-menu.flexcol
             click: this.saveProject
         }));
         catMenu.append(new gui.MenuItem({
+            label: this.voc.openIncludeFolder,
+            click: e => {
+                nw.Shell.openItem(path.join(sessionStorage.projdir, '/include'));
+            }
+        }))
+        catMenu.append(new gui.MenuItem({
             label: this.voc.zipProject,
             click: this.zipProject
         }));
@@ -258,6 +264,9 @@ main-menu.flexcol
                 this.showExporter = true;
                 this.update();
             }
+        }));
+        catMenu.append(new gui.MenuItem({
+            type: 'separator'
         }));
         catMenu.append(new gui.MenuItem({
             label: window.languageJSON.menu.startScreen,
