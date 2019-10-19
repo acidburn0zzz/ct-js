@@ -4,6 +4,7 @@
 const path = require('path'),
       gulp = require('gulp'),
       concat = require('gulp-concat'),
+      replace = require('gulp-replace'),
       sourcemaps = require('gulp-sourcemaps'),
       minimist = require('minimist'),
       stylus = require('gulp-stylus'),
@@ -25,6 +26,7 @@ const path = require('path'),
       spawnise = require('./node_requires/spawnise');
 
 const argv = minimist(process.argv.slice(2));
+const npm = (/^win/).test(process.platform) ? 'npm.cmd' : 'npm';
 
 const pack = require('./app/package.json');
 
@@ -184,8 +186,6 @@ const watch = () => {
     watchRequires();
 };
 
-const build = gulp.parallel([compilePug, compileStylus, compileScripts, copyRequires]);
-
 const lintStylus = () => gulp.src(['./src/styl/**/*.styl', '!./src/styl/3rdParty/**/*.styl'])
     .pipe(stylint())
     .pipe(stylint.reporter())
@@ -218,7 +218,7 @@ const launchNw = () => { // makes a loop that keeps ct.js open if it was closed,
 const docs = async () => {
     try {
         await fs.remove('./app/data/docs/');
-        await spawnise.spawn((/^win/).test(process.platform) ? 'npm.cmd' : 'npm', ['run', 'build'], {
+        await spawnise.spawn(npm, ['run', 'build'], {
             cwd: './docs'
         });
         await fs.copy('./docs/docs/.vuepress/dist', './app/data/docs/');
@@ -290,6 +290,30 @@ const bakeCompletions = () =>
             spaces: 2
         });
     });
+const bakeCtTypedefs = cb => {
+    spawnise.spawn(npm, ['run', 'ctTypedefs'])
+    .then(cb);
+};
+const concatTypedefs = () =>
+    gulp.src(['./src/typedefs/ct.js/types.d.ts', './src/typedefs/ct.js/**/*.d.ts', './src/typedefs/default/**/*.d.ts'])
+    .pipe(concat('global.d.ts'))
+    // patch the generated output so ct classes allow custom properties
+    .pipe(replace(
+        'declare class Copy extends PIXI.AnimatedSprite {', `
+        declare class Copy extends PIXI.AnimatedSprite {
+            [key: string]: any
+        `))
+    .pipe(replace(
+        'declare class Room extends PIXI.Container {', `
+        declare class Room extends PIXI.Container {
+            [key: string]: any
+        `))
+    .pipe(gulp.dest('./app/data/typedefs/'));
+const bakeTypedefs = gulp.series([bakeCtTypedefs, concatTypedefs]);
+
+
+const build = gulp.parallel([compilePug, compileStylus, compileScripts, copyRequires, bakeTypedefs]);
+
 
 const nwPackages = async () => {
     await fs.remove(path.join('./build', `ctjs - v${pack.version}`));
@@ -437,3 +461,4 @@ exports.deploy = deploy;
 exports.deployOnly = deployOnly;
 exports.default = defaultTask;
 exports.bakeCompletions = bakeCompletions;
+exports.bakeTypedefs = bakeTypedefs;

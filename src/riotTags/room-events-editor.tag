@@ -54,7 +54,7 @@ room-events-editor.view.panel
             this.room = this.opts.room;
             setTimeout(() => {
                 var editorOptions = {
-                    language: 'javascript'
+                    language: 'typescript'
                 };
                 this.roomoncreate = window.setupCodeEditor(this.refs.roomoncreate, editorOptions);
                 this.roomonstep = window.setupCodeEditor(this.refs.roomonstep, editorOptions);

@@ -124,7 +124,7 @@ type-editor.panel.view.flexrow
 
         this.on('mount', () => {
             var editorOptions = {
-                language: 'javascript'
+                language: 'typescript'
             };
             setTimeout(() => {
                 this.typeoncreate = window.setupCodeEditor(this.refs.typeoncreate, editorOptions);

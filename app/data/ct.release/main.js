@@ -5,8 +5,25 @@ setInterval(function () {
     deadPool.length = 0;
 }, 1000 * 60);
 
+/**
+ * @typedef ILibMeta
+ *
+ * @property {string} name
+ * @property {string} version
+ * @property {string} [info]
+ * @property {Array} authors
+ */
+
+/**
+ * The ct.js library
+ * @property {Room} room The current room
+ * @namespace
+ */
 const ct = {
-    /** An array with metadata of all the modules used in a ct.js game */
+    /**
+     * An array with metadata of all the modules used in a ct.js game
+     * @type {Object.<string,ILibMeta>}
+     */
     libs: [/*@libs@*/][0],
     speed: [/*@maxfps@*/][0] || 60,
     types: {},
@@ -23,6 +40,12 @@ const ct = {
     get width() {
         return ct.pixiApp.renderer.view.width;
     },
+    /**
+     * Resizes the drawing canvas and viewport to the given value in pixels.
+     * When used with ct.fittoscreen, can be used to enlarge/shrink the viewport.
+     * @param {number} value New width in pixels
+     * @type {number}
+     */
     set width(value) {
         ct.viewWidth = ct.roomWidth = value;
         if (!ct.fittoscreen || ct.fittoscreen.mode === 'fastScale') {
@@ -36,6 +59,12 @@ const ct = {
     get height() {
         return ct.pixiApp.renderer.view.height;
     },
+    /**
+     * Resizes the drawing canvas and viewport to the given value in pixels.
+     * When used with ct.fittoscreen, can be used to enlarge/shrink the viewport.
+     * @param {number} value New height in pixels
+     * @type {number}
+     */
     set height(value) {
         ct.viewHeight = ct.roomHeight = value;
         if (!ct.fittoscreen || ct.fittoscreen.mode === 'fastScale') {
@@ -56,6 +85,10 @@ console.table({
 });
 
 ct.highDensity = [/*@highDensity@*/][0];
+/**
+ * The PIXI.Application that runs ct.js game
+ * @type {PIXI.Application}
+ */
 ct.pixiApp = new PIXI.Application({
     width: [/*@startwidth@*/][0],
     height: [/*@startheight@*/][0],
@@ -69,10 +102,17 @@ PIXI.Ticker.shared.maxFPS = [/*@maxfps@*/][0] || 0;
 if (!ct.pixiApp.renderer.options.antialias) {
     PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 }
+/**
+ * @type PIXI.Container
+ */
 ct.stage = ct.pixiApp.stage;
 ct.pixiApp.renderer.autoDensity = ct.highDensity;
 document.getElementById('ct').appendChild(ct.pixiApp.view);
 
+/**
+ * A library of different utility functions, mainly Math-related, but not limited to them.
+ * @namespace
+ */
 ct.u = {
     /**
      * Returns the length of a vector projection onto an X axis.
@@ -80,7 +120,7 @@ ct.u = {
      * @param {number} d The direction of the vector
      * @returns {number} The length of the projection
      *
-     * @alias lengthDirX
+     * @alias ct.u.lengthDirX
      */
     ldx(l, d) {
         return l * Math.cos(d * Math.PI / -180);
@@ -91,7 +131,7 @@ ct.u = {
      * @param {number} d The direction of the vector
      * @returns {number} The length of the projection
      *
-     * @alias lengthDirY
+     * @alias ct.u.lengthDirY
      */
     ldy(l, d) {
         return l * Math.sin(d * Math.PI / -180);
@@ -104,7 +144,8 @@ ct.u = {
      * @param {number} y2 The y location of the second point
      * @returns {number} The angle of the resulting vector, in degrees
      *
-     * @alias pointDirection
+     * @alias ct.u.pointDirection
+     * @alias ct.u.pdn
      */
     pdn(x1, y1, x2, y2) {
         return (Math.atan2(y2 - y1, x2 - x1) * -180 / Math.PI + 360) % 360;
@@ -118,7 +159,7 @@ ct.u = {
      * @param {number} y2 The y location of the second point
      * @returns {number} The distance between the two points
      *
-     * @alias pointDistance
+     * @alias ct.u.pointDistance
      */
     pdc(x1, y1, x2, y2) {
         return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
@@ -219,10 +260,10 @@ ct.u = {
      * Tests whether a given point is inside the given rectangle (it can be either a copy or an array)
      * @param {number} x The x coordinate of the point
      * @param {number} y The y coordinate of the point
-     * @param {Copy|Array<Number>} arg Either a copy (it must have a rectangular shape) or an array in a form of [x1, y1, x2, y2], where (x1;y1) and (x2;y2) specify the two opposite corners of the rectangle
+     * @param {(Copy|Array<Number>)} arg Either a copy (it must have a rectangular shape) or an array in a form of [x1, y1, x2, y2], where (x1;y1) and (x2;y2) specify the two opposite corners of the rectangle
      * @returns {boolean} `true` if the point is inside the rectangle, `false` otherwise
      *
-     * @alias pointRectangle
+     * @alias ct.u.pointRectangle
      */
     prect(x, y, arg) {
         var xmin, xmax, ymin, ymax;
@@ -243,10 +284,10 @@ ct.u = {
      * Tests whether a given point is inside the given circle (it can be either a copy or an array)
      * @param {number} x The x coordinate of the point
      * @param {number} y The y coordinate of the point
-     * @param {Copy|Array<Number>} arg Either a copy (it must have a circular shape) or an array in a form of [x1, y1, r], where (x1;y1) define the center of the circle and `r` defines the radius of it
+     * @param {(Copy|Array<Number>)} arg Either a copy (it must have a circular shape) or an array in a form of [x1, y1, r], where (x1;y1) define the center of the circle and `r` defines the radius of it
      * @returns {boolean} `true` if the point is inside the circle, `false` otherwise
      *
-     * @alias pointCircle
+     * @alias ct.u.pointCircle
      */
     pcircle(x, y, arg) {
         if (arg.splice) {
@@ -256,12 +297,12 @@ ct.u = {
     },
     /**
      * Copies all the properties of the source object to the destination object. This is **not** a deep copy. Useful for extending some settings with default values, or for combining data.
-     * @param {Object} o1 The destination object
-     * @param {Object} o2 The source object
+     * @param {object} o1 The destination object
+     * @param {object} o2 The source object
      * @param {any} [arr] An optional array of properties to copy. If not specified, all the properties will be copied.
-     * @returns {Object} The modified destination object
+     * @returns {object} The modified destination object
      *
-     * @alias extend
+     * @alias ct.u.extend
      */
     ext (o1, o2, arr) {
         if (arr) {

@@ -45,7 +45,6 @@
     ]
   },
   "dependencies": {
-    "@types/pixi.js": "^4.8.9",
     "archiver": "^3.1.1",
     "csswring": "7.0.0",
     "fs-extra": "^7.0.0",

@@ -84,15 +84,17 @@ class CtAction {
     /**
      * Returns whether the action became active in the current frame,
      * either by a button just pressed or by using a scalar input.
-     * @returns {boolean} `true` for being pressed and `false` otherwise
+     * `true` for being pressed and `false` otherwise
+     * @type {boolean}
      */
     get pressed() {
         return this.prevValue === 0 && this.value !== 0;
     }
     /**
      * Returns whether the action became inactive in the current frame,
-     * either by releasing all buttons or by resting all scalar inputs. 
-     * @returns {boolean} `true` for being released and `false` otherwise
+     * either by releasing all buttons or by resting all scalar inputs.
+     * `true` for being released and `false` otherwise
+     * @type {boolean}
      */
     get released() {
         return this.prevValue !== 0 && this.value === 0;
@@ -100,7 +102,8 @@ class CtAction {
     /**
      * Returns whether the action is active, e.g. by a pressed button
      * or a currently used scalar input
-     * @returns {boolean} `true` for being active and `false` otherwise
+     * `true` for being active and `false` otherwise
+     * @type {boolean}
      */
     get down() {
         return this.value !== 0;
@@ -114,11 +117,14 @@ class CtAction {
 }
 
 ct.actions = {};
+/**
+ * @namespace
+ */
 ct.inputs = {
     registry: {},
     /**
      * Adds a new action and puts it into `ct.actions`.
-     * 
+     *
      * @param {string} name The name of an action, as it will be used in `ct.actions`.
      * @param {Array<Object>} methods A list of input methods. This list can be changed later.
      * @returns {CtAction} The created action

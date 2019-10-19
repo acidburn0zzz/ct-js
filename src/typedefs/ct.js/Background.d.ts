@@ -1,5 +1,5 @@
 interface IBackgroundTemplate {
-    
+    // TODO:
 }
 
 declare class Background extends PIXI.TilingSprite {

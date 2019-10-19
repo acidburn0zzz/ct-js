@@ -1,4 +1,7 @@
 if (!ct.sound) {
+    /**
+     * @namespace
+     */
     ct.sound = {
         /**
          * Detects if a particular codec is supported in the system
@@ -13,13 +16,13 @@ if (!ct.sound) {
          * Creates a new Sound object and puts it in resource object
          *
          * @param {string} name Sound's name
-         * @param {Object} formats A collection of sound files of specified extension, in format `extension: path`
+         * @param {object} formats A collection of sound files of specified extension, in format `extension: path`
          * @param {string} [formats.ogg] Local path to the sound in ogg format
          * @param {string} [formats.wav] Local path to the sound in wav format
          * @param {string} [formats.mp3] Local path to the sound in mp3 format
          * @param {number} [options] An options object
          *
-         * @returns {Object} Sound's object
+         * @returns {object} Sound's object
          */
         init(name, formats, options) {
             var src = '';
@@ -59,7 +62,7 @@ if (!ct.sound) {
          * Spawns a new sound and plays it.
          *
          * @param {string} name The name of sound to be played
-         * @param {Object} [opts] Options object that is applied to a newly created audio tag
+         * @param {object} [opts] Options object that is applied to a newly created audio tag
          * @param {Function} [cb] A callback, which is called when the sound finishes playing
          *
          * @returns {HTMLTagAudio|Boolean} The created audio or `false` (if a sound wasn't created)

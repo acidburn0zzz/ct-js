@@ -4,6 +4,9 @@
           loadingBar = loadingLabel.querySelector('.ct-aLoadingBar');
     /* global dragonBones */
     const dbFactory = window.dragonBones? dragonBones.PixiFactory.factory : null;
+    /**
+     * @namespace
+     */
     ct.res = {
         soundsLoaded: 0,
         soundsTotal: [/*@sndtotal@*/][0],
@@ -51,7 +54,7 @@
         /**
          * Creates a DragonBones skeleton, ready to be added to your copies.
          * @param {string} name The name of the skeleton asset
-         * @returns {Object} The created skeleton
+         * @returns {object} The created skeleton
          */
         makeSkeleton(name) {
             const r = ct.res.skelRegistry[name],

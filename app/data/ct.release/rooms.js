@@ -4,7 +4,6 @@
         /**
          * Creates an instance of Room, based on a given template.
          * @param {object} template The template to use, usually from `ct.rooms.templates`.
-         * @memberof Room
          */
         constructor(template) {
             super();
@@ -43,30 +42,35 @@
             }
             return this;
         }
-        /**
-         * The horizontal position of the room.
-         * @memberof Room
-         */
         get x () {
             return -this.position.x;
         }
+        /**
+         * The horizontal position of the room.
+         * @param {number} value New value
+         * @type {number}
+         */
         set x (value) {
             this.position.x = -value;
             return value;
         }
-        /**
-         * The vertical position of the room.
-         * @memberof Room
-         */
         get y () {
             return -this.position.y;
         }
+        /**
+         * The vertical position of the room.
+         * @param {number} value New value
+         * @type {number}
+         */
         set y (value) {
             this.position.y = -value;
             return value;
         }
     }
     var nextRoom;
+    /**
+     * @namespace
+     */
     ct.rooms = {
         templates: {},
         /**
@@ -151,6 +155,7 @@
         },
         /**
          * The name of the starting room, as it was set in ct.IDE.
+         * @type {string}
          */
         starting: '@startroom@'
     };

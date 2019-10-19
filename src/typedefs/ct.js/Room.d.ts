@@ -41,4 +41,6 @@ declare class Room extends PIXI.Container {
 
     template: IRoomTemplate;
     name: string;
+
+    [key: string]: any
 }
