@@ -13,14 +13,12 @@
         monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
         monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
             noLib: true,
-            allowNonTsExtensions: true,
-            noImplicitThis: true
+            allowNonTsExtensions: true
         });
         monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
         monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
             noLib: true,
-            allowNonTsExtensions: true,
-            noImplicitThis: true
+            allowNonTsExtensions: true
         });
 
         for (const file of lib) {
@@ -62,6 +60,92 @@
         });*/
     };
 
+    const isRangeSelection = function(s) {
+        if (s.selectionStartLineNumber !== s.positionLineNumber) {
+            return true;
+        }
+        if (s.selectionStartColumn !== s.positionColumn) {
+            return true;
+        }
+        return false;
+    };
+
+    const setUpWrappers = function(editor, options) {
+        // Prohibit use of Delete & Backspace on editable edges
+        editor.onKeyDown(function(evt) {
+            const model = editor.getModel();
+            const maxLine = model.getLineCount() - 1;
+            const lastLineCol = model.getLineContent(maxLine).length + 1;
+            console.log(evt, editor.getSelections(), lastLineCol, maxLine);
+            if (evt.code === 'Delete') {
+                const selections = editor.getSelections();
+                for (const selection of selections) {
+                    // Range selections are safe as they delete the selection's contents,
+                    // not characters before or after them.
+                    if (isRangeSelection(selection)) {
+                        continue;
+                    }
+                    // As this is a plain cursor, let's check
+                    // just one pair of its parameters
+                    if (selection.selectionStartLineNumber === maxLine &&
+                        selection.selectionStartColumn === lastLineCol
+                    ) {
+                        console.log('I\'m trying :c');
+                        evt.preventDefault();
+                        return;
+                    }
+                }
+            } else if (evt.code === 'Backspace') {
+                const selections = editor.getSelections();
+                for (const selection of selections) {
+                    if (isRangeSelection(selection)) {
+                        continue;
+                    }
+                    if (selection.selectionStartLineNumber === 2 &&
+                        selection.selectionStartColumn === 1
+                     ) {
+                        console.log('I\'m trying :c');
+                        evt.preventDefault();
+                        return;
+                    }
+                }
+            }
+        });
+        // Clamp selections so they can't select wrapping lines
+        editor.onDidChangeCursorSelection(function(evt) {
+            let resetSelections = false;
+            const selections = [evt.selection, ...evt.secondarySelections];
+            const model = editor.getModel();
+            const maxLine = model.getLineCount() - 1;
+            const lastLineCol = model.getLineContent(maxLine - 1).length - 1;
+            for (const selection of selections) {
+                if (selection.selectionStartLineNumber < 2) {
+                    selection.selectionStartLineNumber = 2;
+                    selection.selectionStartColumn = 1;
+                    resetSelections = true;
+                }
+                if (selection.positionLineNumber < 2) {
+                    selection.positionLineNumber = 2;
+                    selection.positionColumn = 1;
+                    resetSelections = true;
+                }
+                if (selection.selectionStartLineNumber > maxLine) {
+                    selection.selectionStartLineNumber = maxLine;
+                    selection.selectionStartColumn = lastLineCol;
+                    resetSelections = true;
+                }
+                if (selection.positionLineNumber > maxLine) {
+                    selection.positionLineNumber = maxLine;
+                    selection.positionColumn = lastLineCol;
+                    resetSelections = true;
+                }
+            }
+            if (resetSelections) {
+                editor.setSelections(selections);
+            }
+        });
+    };
+
     var defaultOptions = {
         language: 'plain_text',
         fixedOverflowWidgets: true,
@@ -69,6 +153,7 @@
         fontFamily: localStorage.fontFamily || 'Iosevka, monospace',
         theme: 'tomorrow',
         colorDecorators: true,
+
         get fontLigatures() {
             return localStorage.codeLigatures !== 'off';
         }
@@ -94,8 +179,15 @@
     window.setupCodeEditor = (tag, options) => {
         const opts = extend(extend({}, defaultOptions), options);
         opts.value = opts.value || tag.value || '';
+        if (opts.wrapper) {
+            opts.value = `${opts.wrapper[0]}\n${opts.value}\n${opts.wrapper[1]}`;
+        }
+        console.log(opts);
         const codeEditor = monaco.editor.create(tag, opts);
 
+        if (opts.lockWrapper) {
+            setUpWrappers(codeEditor, opts);
+        }
         extendHotkeys(codeEditor);
 
         tag.codeEditor = codeEditor;

@@ -124,18 +124,38 @@ type-editor.panel.view.flexrow
 
         this.on('mount', () => {
             var editorOptions = {
-                language: 'typescript'
+                language: 'typescript',
+                lockWrapper: true
             };
             setTimeout(() => {
-                this.typeoncreate = window.setupCodeEditor(this.refs.typeoncreate, editorOptions);
-                this.typeonstep = window.setupCodeEditor(this.refs.typeonstep, editorOptions);
-                this.typeondraw = window.setupCodeEditor(this.refs.typeondraw, editorOptions);
-                this.typeondestroy = window.setupCodeEditor(this.refs.typeondestroy, editorOptions);
-
-                this.typeoncreate.setValue(this.type.oncreate);
-                this.typeonstep.setValue(this.type.onstep);
-                this.typeondraw.setValue(this.type.ondraw);
-                this.typeondestroy.setValue(this.type.ondestroy);
+                this.typeoncreate = window.setupCodeEditor(
+                    this.refs.typeoncreate,
+                    Object.assign({}, editorOptions, {
+                        value: this.type.oncreate,
+                        wrapper: ['function onCreate(this: Copy) {', '}']
+                    })
+                );
+                this.typeonstep = window.setupCodeEditor(
+                    this.refs.typeonstep,
+                    Object.assign({}, editorOptions, {
+                        value: this.type.oncreate,
+                        wrapper: ['function onStep(this: Copy) {', '}']
+                    })
+                );
+                this.typeondraw = window.setupCodeEditor(
+                    this.refs.typeondraw,
+                    Object.assign({}, editorOptions, {
+                        value: this.type.oncreate,
+                        wrapper: ['function onDraw(this: Copy) {', '}']
+                    })
+                );
+                this.typeondestroy = window.setupCodeEditor(
+                    this.refs.typeondestroy,
+                    Object.assign({}, editorOptions, {
+                        value: this.type.oncreate,
+                        wrapper: ['function onDestroy(this: Copy) {', '}']
+                    })
+                );
 
                 this.typeoncreate.onDidChangeModelContent(e => {
                     this.type.oncreate = this.typeoncreate.getValue();
