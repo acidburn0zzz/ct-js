@@ -16,8 +16,10 @@ setInterval(function () {
 
 /**
  * The ct.js library
- * @property {Room} room The current room
  * @namespace
+ * @property {Room} room The current room
+ * @property {number} viewWidth The width of the current view, in game units
+ * @property {number} viewHeight The height of the current view, in game units
  */
 const ct = {
     /**

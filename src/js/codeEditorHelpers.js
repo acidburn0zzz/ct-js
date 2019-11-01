@@ -70,54 +70,39 @@
         return false;
     };
 
-    const setUpWrappers = function(editor, options) {
-        // Prohibit use of Delete & Backspace on editable edges
-        editor.onKeyDown(function(evt) {
-            const model = editor.getModel();
-            const maxLine = model.getLineCount() - 1;
-            const lastLineCol = model.getLineContent(maxLine).length + 1;
-            console.log(evt, editor.getSelections(), lastLineCol, maxLine);
-            if (evt.code === 'Delete') {
-                const selections = editor.getSelections();
-                for (const selection of selections) {
-                    // Range selections are safe as they delete the selection's contents,
-                    // not characters before or after them.
-                    if (isRangeSelection(selection)) {
-                        continue;
-                    }
-                    // As this is a plain cursor, let's check
-                    // just one pair of its parameters
-                    if (selection.selectionStartLineNumber === maxLine &&
-                        selection.selectionStartColumn === lastLineCol
-                    ) {
-                        console.log('I\'m trying :c');
-                        evt.preventDefault();
-                        return;
-                    }
-                }
-            } else if (evt.code === 'Backspace') {
-                const selections = editor.getSelections();
-                for (const selection of selections) {
-                    if (isRangeSelection(selection)) {
-                        continue;
-                    }
-                    if (selection.selectionStartLineNumber === 2 &&
-                        selection.selectionStartColumn === 1
-                     ) {
-                        console.log('I\'m trying :c');
-                        evt.preventDefault();
-                        return;
-                    }
-                }
-            }
+    const setUpWrappers = function(editor) {
+        editor.setPosition({
+            column: 0,
+            lineNumber: 2
         });
+        /* These signal to custom commands
+           that the current cursor's position is in the end/start of the editable range */
+        const contextSOR = editor.createContextKey('startOfEditable', false),
+              contextEOR = editor.createContextKey('endOfEditable', false);
+
+        // Turns out the Delete and Backspace keys do not produce a keyboard event but commands
+        // These commands overlay the default ones, thus cancelling the default behaviour
+        // @see https://github.com/microsoft/monaco-editor/issues/940
+        editor.addCommand(monaco.KeyCode.Backspace, function() {
+            void 0; // woo!
+            console.log('woo');
+        }, 'startOfEditable');
+        editor.addCommand(monaco.KeyCode.Delete, function() {
+            void 0; // magic!
+            console.log('woo');
+        }, 'endOfEditable');
+
         // Clamp selections so they can't select wrapping lines
         editor.onDidChangeCursorSelection(function(evt) {
             let resetSelections = false;
             const selections = [evt.selection, ...evt.secondarySelections];
             const model = editor.getModel();
             const maxLine = model.getLineCount() - 1;
-            const lastLineCol = model.getLineContent(maxLine - 1).length - 1;
+            const lastLineCol = model.getLineContent(Math.max(maxLine, 1)).length + 1;
+
+            contextEOR.set(false);
+            contextSOR.set(false);
+
             for (const selection of selections) {
                 if (selection.selectionStartLineNumber < 2) {
                     selection.selectionStartLineNumber = 2;
@@ -138,6 +123,26 @@
                     selection.positionLineNumber = maxLine;
                     selection.positionColumn = lastLineCol;
                     resetSelections = true;
+                }
+                /* Get if any of the cursors happened to be in the beginning/end
+                   of the editable range, so that we can block Delete/Backspace behavior.
+                   Range selections are safe, as they delete the selected content,
+                   not that is behind/in front of them.
+                */
+                if (!isRangeSelection(selection)) {
+                    if (selection.selectionStartLineNumber === 2 &&
+                        selection.selectionStartColumn === 1
+                    ) {
+                        contextSOR.set(true);
+                        console.log('Start on');
+                    }
+                    console.log([selection.positionLineNumber, maxLine], [selection.positionColumn, lastLineCol]);
+                    if (selection.positionLineNumber === maxLine &&
+                        selection.positionColumn === lastLineCol
+                    ) {
+                        contextEOR.set(true);
+                        console.log('End on');
+                    }
                 }
             }
             if (resetSelections) {
@@ -181,12 +186,13 @@
         opts.value = opts.value || tag.value || '';
         if (opts.wrapper) {
             opts.value = `${opts.wrapper[0]}\n${opts.value}\n${opts.wrapper[1]}`;
+            opts.lineNumbers = num => Math.max((num || 0) - 1, 1);
         }
         console.log(opts);
         const codeEditor = monaco.editor.create(tag, opts);
 
         if (opts.lockWrapper) {
-            setUpWrappers(codeEditor, opts);
+            setUpWrappers(codeEditor);
         }
         extendHotkeys(codeEditor);
 
