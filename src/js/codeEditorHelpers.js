@@ -134,14 +134,11 @@
                         selection.selectionStartColumn === 1
                     ) {
                         contextSOR.set(true);
-                        console.log('Start on');
                     }
-                    console.log([selection.positionLineNumber, maxLine], [selection.positionColumn, lastLineCol]);
                     if (selection.positionLineNumber === maxLine &&
                         selection.positionColumn === lastLineCol
                     ) {
                         contextEOR.set(true);
-                        console.log('End on');
                     }
                 }
             }
@@ -188,7 +185,6 @@
             opts.value = `${opts.wrapper[0]}\n${opts.value}\n${opts.wrapper[1]}`;
             opts.lineNumbers = num => Math.max((num || 0) - 1, 1);
         }
-        console.log(opts);
         const codeEditor = monaco.editor.create(tag, opts);
 
         if (opts.lockWrapper) {
