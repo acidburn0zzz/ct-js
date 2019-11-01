@@ -138,21 +138,21 @@ type-editor.panel.view.flexrow
                 this.typeonstep = window.setupCodeEditor(
                     this.refs.typeonstep,
                     Object.assign({}, editorOptions, {
-                        value: this.type.oncreate,
+                        value: this.type.onstep,
                         wrapper: ['function onStep(this: Copy) {', '}']
                     })
                 );
                 this.typeondraw = window.setupCodeEditor(
                     this.refs.typeondraw,
                     Object.assign({}, editorOptions, {
-                        value: this.type.oncreate,
+                        value: this.type.ondraw,
                         wrapper: ['function onDraw(this: Copy) {', '}']
                     })
                 );
                 this.typeondestroy = window.setupCodeEditor(
                     this.refs.typeondestroy,
                     Object.assign({}, editorOptions, {
-                        value: this.type.oncreate,
+                        value: this.type.ondestroy,
                         wrapper: ['function onDestroy(this: Copy) {', '}']
                     })
                 );

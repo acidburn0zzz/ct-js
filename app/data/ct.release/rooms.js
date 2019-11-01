@@ -1,10 +1,6 @@
 (function () {
     /* global deadPool */
     class Room extends PIXI.Container {
-        /**
-         * Creates an instance of Room, based on a given template.
-         * @param {object} template The template to use, usually from `ct.rooms.templates`.
-         */
         constructor(template) {
             super();
             this.x = this.y = 0;
@@ -45,11 +41,6 @@
         get x () {
             return -this.position.x;
         }
-        /**
-         * The horizontal position of the room.
-         * @param {number} value New value
-         * @type {number}
-         */
         set x (value) {
             this.position.x = -value;
             return value;
@@ -57,11 +48,6 @@
         get y () {
             return -this.position.y;
         }
-        /**
-         * The vertical position of the room.
-         * @param {number} value New value
-         * @type {number}
-         */
         set y (value) {
             this.position.y = -value;
             return value;
@@ -106,8 +92,6 @@
         /**
          * Switches to the given room. Note that this transition happens at the end
          * of the frame, so the name of a new room may be overridden.
-         * @param {string} room The name of a new room
-         * @returns {void}
          */
         'switch'(room) {
             nextRoom = room;
@@ -160,6 +144,11 @@
         starting: '@startroom@'
     };
 })();
+/**
+ * The current room
+ * @type {Room}
+ */
+ct.room = null;
 
 ct.rooms.beforeStep = function () {
     /*%beforeroomstep%*/

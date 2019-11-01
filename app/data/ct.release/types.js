@@ -379,9 +379,7 @@ const Copy = (function () {
         },
         /**
          * Applies a function to a given object (e.g. to a copy)
-         * @param {(Copy|object)} obj The object to apply the function to1
-         * @param {Function} func The function that is being applied to an object
-         * @return {void}
+         * @interface ITypesWith
          */
         'with'(obj, func) {
             func.apply(obj, this);

@@ -4,10 +4,8 @@
 ct.styles = {
     types: { },
     /**
-     * Creates a new style with a given name. Technically, it just writes `data` to `ct.styles.types`.
-     * @param {string} name The name of a new style
-     * @param {object} data The style data
-     * @returns {object} The passed `data` object
+     * Creates a new style with a given name. Technically, it just writes `data` to `ct.styles.types`
+     * @interface IStyleNew
      */
     new(name, data) {
         ct.styles.types[name] = data;

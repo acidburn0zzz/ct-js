@@ -17,9 +17,6 @@ setInterval(function () {
 /**
  * The ct.js library
  * @namespace
- * @property {Room} room The current room
- * @property {number} viewWidth The width of the current view, in game units
- * @property {number} viewHeight The height of the current view, in game units
  */
 const ct = {
     /**
@@ -76,7 +73,17 @@ const ct = {
             ct.fittoscreen();
         }
         return value;
-    }
+    },
+    /**
+     * The width of the current view, in game units
+     * @type {number}
+     */
+    viewWidth: null,
+    /**
+     * The height of the current view, in game units
+     * @type {number}
+     */
+    viewHeight: null
 };
 
 // eslint-disable-next-line no-console

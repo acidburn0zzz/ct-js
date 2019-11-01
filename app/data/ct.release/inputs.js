@@ -1,3 +1,7 @@
+/**
+ * @property {number} value
+ * @property {string} name
+ */
 class CtAction {
     /**
      * Creates a new ct action.
@@ -116,6 +120,9 @@ class CtAction {
     */
 }
 
+/**
+ * @type {Object.<string,CtAction>}
+ */
 ct.actions = {};
 /**
  * @namespace
