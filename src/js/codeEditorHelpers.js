@@ -85,11 +85,9 @@
         // @see https://github.com/microsoft/monaco-editor/issues/940
         editor.addCommand(monaco.KeyCode.Backspace, function() {
             void 0; // woo!
-            console.log('woo');
         }, 'startOfEditable');
         editor.addCommand(monaco.KeyCode.Delete, function() {
             void 0; // magic!
-            console.log('woo');
         }, 'endOfEditable');
 
         // Clamp selections so they can't select wrapping lines
