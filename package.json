@@ -34,7 +34,7 @@
     "gulp-stylus": "^2.7.0",
     "gulp-zip": "^5.0.0",
     "minimist": "^1.2.0",
-    "node-notifier": "^5.2.1",
+    "node-notifier": "^8.0.1",
     "nw-builder": "^3.5.7",
     "pug": "^2.0.3",
     "pug-lint-config-clock": "^2.0.0",
